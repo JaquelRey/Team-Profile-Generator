@@ -1,5 +1,9 @@
-const createEngineer = function(engineer) {
-    return `
+//using a dispatch table to generate employee cards
+//first time using these so I've just built the functions inside the table
+//if all goes well I could seperate them out 
+let dispatchTable = {
+    Engineer: function (engineer) {
+        return `
     <div class="columns m-2">
         <div class="column">
             <div class="card">
@@ -32,10 +36,10 @@ const createEngineer = function(engineer) {
                 </div>
               </div>
         </div>`
-}
+    },
 
-const createIntern = function(intern) {
-    return `
+    Intern: function (intern) {
+        return `
     <div class="columns m-2">
         <div class="column">
             <div class="card">
@@ -68,10 +72,10 @@ const createIntern = function(intern) {
                 </div>
               </div>
         </div>`
-}
+    },
 
-const createManager = function(manager) {
-    return `
+    Manager: function (manager) {
+        return `
     <div class="columns m-2">
         <div class="column">
             <div class="card">
@@ -104,53 +108,32 @@ const createManager = function(manager) {
                 </div>
               </div>
         </div>`
+ }
 }
+//the meat of this whole page is this function
+//array of team member objects passed in from script.js
+function createHTML(team) {
+    //empty array to populate with the returned employee cards (html strings)
+    let completedTeam = []
 
-createTeam = (data) => {
-    // array to fill with team members generated
+    //for each employee object in the team
+    team.forEach(genCard);
 
-    teamArray = [];
-
-    for (let i = 0; i < data.length; i++) {
-        const employee = data[i];
-        const role = employee.getRole();
-
-        // call each type of employee
-
-        if (role === 'Engineer') {
-            const createdEngineer = createEngineer(employee);
-            // push to array
-            teamArray.push(createdEngineer);
-        }
-
-        if (role === 'Intern') {
-            const createdIntern = createIntern(employee);
-            // push to array
-            teamArray.push(createdIntern);
-        }
-
-        if (role === 'Manager') {
-            const createdManager = createManager(employee);
-            // push to array
-            teamArray.push(createdManager);
-        }
-        
+    function genCard(member){
+        //get the employee role (which will serve as dispatch table key)
+        let type = member.getRole();
+        //call the command to gen the correct card
+        //(employee obj passed in to access values)
+        let card = dispatchTable[type](member)
+        //push the card returned to the array created earlier
+        completedTeam.push(card)
     }
-
-    // joining team array
-
-    const completedTeam = teamArray.join('');
-
-    const generateTeam = createPage(completedTeam);
-
-    return generateTeam;
-
+    return fullPage(completedTeam.join(" "));
 }
 
-// making full page html
-
-const createPage = function(completedTeam) {
-    return`
+// slap the generated html for the employee cards into the main page and return it
+const fullPage = function (cards) {
+    return `
     <!DOCTYPE html>
 <html>
   <head>
@@ -173,7 +156,7 @@ const createPage = function(completedTeam) {
 
     <div class="columns m-2">
 
-    ${completedTeam}
+    ${cards}
     
     </div>
 
@@ -181,4 +164,5 @@ const createPage = function(completedTeam) {
 </html>`
 }
 
-module.exports = generateTeam;
+
+module.exports = createHTML();

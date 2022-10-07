@@ -12,18 +12,9 @@ test('creates a new manager object', () => {
 });
 
 
-
-
 // test getOffice()
 
 // already included in object test since it's just a number value
-
-// test('gets manager github', () => {
-//     const manager = new manager('Bryan', 420, 'notgunna@lie.com', 69);
-
-//     expect(manager.getName()).toEqual(expect.any(Number));
-// });
-
 
 
 // test getRole()
