@@ -1,9 +1,9 @@
-export const createPage = (array) => {
+import * as fs from 'fs/promises'
+export const createPage = (fileName, array) => {
 
     let createEngineer = (engineer) => {
         return `
-<div class="columns m-2">
-    <div class="column">
+    <div class="column is-narrow">
         <div class="card">
             <header class="card-header has-background-info">
               <p class="card-header-title has-text-white">
@@ -38,8 +38,7 @@ export const createPage = (array) => {
 
     let createIntern = (intern) => {
         return `
-<div class="columns m-2">
-    <div class="column">
+    <div class="column is-narrow">
         <div class="card">
             <header class="card-header has-background-info">
               <p class="card-header-title has-text-white">
@@ -74,8 +73,8 @@ export const createPage = (array) => {
 
     let createManager = (manager) => {
         return `
-<div class="columns m-2">
-    <div class="column">
+
+    <div class="column is-narrow">
         <div class="card">
             <header class="card-header has-background-info">
               <p class="card-header-title has-text-white">
@@ -132,7 +131,7 @@ export const createPage = (array) => {
       <br>
     </div> </section>
 
-    <div class="columns m-2">
+    <div class="columns is-justify-content-center m-2">
 
     ${cards}
     
@@ -176,12 +175,20 @@ export const createPage = (array) => {
     let cards = completedTeam.join('')
 
 
-    let returnPage = () => {
-        Promise.resolve(
-            fullPage(cards)
-        )
+    
+
+    let data = fullPage(cards)
+
+    let mymethod = async() => {
+
+        
+
+        
+        await fs.writeFile(`./created/${fileName}-team.html`, data);
+
+        
     }
 
-    return returnPage()
-    
+    mymethod()
+
 }

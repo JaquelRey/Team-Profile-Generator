@@ -1,17 +1,17 @@
 
 // node modules 
-import * as fs from 'fs/promises'
+
 import inquirer from 'inquirer'
 
 
 //func to generate html after data collection is finished
-import {createPage} from './src/create-team.js'
-import {createEmployees} from './src/inquirer-modules.js'
+import { createPage } from './src/create-team.js'
+import { createEmployees } from './src/inquirer-modules.js'
 
 //class constructors
-import {Manager} from './lib/Manager.js'
-import {Engineer} from './lib/Engineer.js'
-import {Intern} from './lib/Intern.js'
+import { Manager } from './lib/Manager.js'
+import { Engineer } from './lib/Engineer.js'
+import { Intern } from './lib/Intern.js'
 
 const chooseRole =
 {
@@ -32,25 +32,12 @@ const confirmTeam =
 
 
 //calls html generation, and returns it to fs
-let creatingPage = async () => {
-
-    //making the manager's name part of the file name, 
-    //removing spaces in the case of 'Firstname Lastname'
-    let checkedName = (teamArray[0].name).replaceAll(' ', '')
-    //path / filename to use in fs call
-    let pathAndName = (`./created/${checkedName}-team.html`)
+let creatingPage = (checkedName) => {
     
     console.log('Creating your team\'s page....');
     console.log('==========================')
 
-    await createPage(teamArray)
-    .then((result) => {
-        fs.writeFile(pathAndName, result, (error) => {
-            if (error) throw error;
-            console.log('Success! Team page created and stored in the \"created\" folder!')
-        });
-    })
-
+    createPage(checkedName, teamArray)
 }
 
 const teamArray = [];
@@ -104,7 +91,8 @@ const callStack = async function (role) {
         )
 
     } else {
-        console.log('Recursion successful!')
+        console.log('==========================')
+        console.log('Restarting stack...')
         console.log('==========================')
     }
 
@@ -135,27 +123,39 @@ const callStack = async function (role) {
     console.table(teamArray)
 
     console.log('Checking team status...')
-    console.log('==========================')
-
-    await inquirer.prompt(confirmTeam)
-        .then((answer) => {
 
 
-            if (answer.finished === 'Finish Team') {
-                creatingPage()
-                throw new Error('All done here!')
-            } else {
-                console.log('Awaiting role selection...')
-                console.log('==========================')
-            }
+    let answer = await inquirer.prompt(confirmTeam)
 
-        }).then(async () => {
+    //if user elects to finish building team and gen page
+    if (answer.finished === 'Finish Team') {
 
-            let query = await roleHandler()
+        let fileName = (teamArray[0].name).replaceAll(' ', '')
+        
 
-            await callStack(query.emprole)
+        console.log(`Success! Page location: ./created/${fileName}-team.html`);
+        console.log('==========================')
 
-        })
+        try {
+            creatingPage(fileName)
+        } finally {
+            
+            setTimeout(() => {
+                process.exit(0)
+            }, 30);
+        }
+
+    } else if (answer.finished != 'Finish Team') {
+
+        console.log('Awaiting role selection...')
+        console.log('==========================')
+
+        let query = await roleHandler()
+
+        setTimeout(() => {
+            callStack(query.emprole)
+        }, 1000);
+    }
 
 };
 
