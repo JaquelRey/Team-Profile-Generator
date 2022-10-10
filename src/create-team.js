@@ -1,5 +1,7 @@
-function createEngineer(member) {
-    return `
+export const createPage = (array) => {
+
+    let createEngineer = (engineer) => {
+        return `
 <div class="columns m-2">
     <div class="column">
         <div class="card">
@@ -13,29 +15,29 @@ function createEngineer(member) {
                     <tbody>
                         <tr>
                             <th>Name</th>
-                            <td>${member.name}</td>
+                            <td>${engineer.name}</td>
                         </tr>
                         <tr>
                             <th>ID</th>
-                            <td>${member.id}</td>
+                            <td>${engineer.id}</td>
                         </tr>
                         <tr>
                             <th>Email</th>
-                            <td> <a href="mailto:${member.email}">${member.email}</a></td>
+                            <td> <a href="mailto:${engineer.email}">${engineer.email}</a></td>
                         </tr>
                         <tr>
                             <th>Github</th>
-                            <td><a href="https://github.com/${member.github}">${member.github}</a></td>
+                            <td><a href="https://github.com/${engineer.github}">${engineer.github}</a></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
           </div>
     </div>`
-}
+    }
 
-function createIntern(member) {
-    return `
+    let createIntern = (intern) => {
+        return `
 <div class="columns m-2">
     <div class="column">
         <div class="card">
@@ -49,29 +51,29 @@ function createIntern(member) {
                     <tbody>
                         <tr>
                             <th>Name</th>
-                            <td>${member.name}</td>
+                            <td>${intern.name}</td>
                         </tr>
                         <tr>
                             <th>ID</th>
-                            <td>${member.id}</td>
+                            <td>${intern.id}</td>
                         </tr>
                         <tr>
                             <th>Email</th>
-                            <td> <a href="mailto:${member.email}">${member.email}</a></td>
+                            <td> <a href="mailto:${intern.email}">${intern.email}</a></td>
                         </tr>
                         <tr>
                             <th>School</th>
-                            <td>${member.school}</td>
+                            <td>${intern.school}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
           </div>
     </div>`
-}
+    }
 
-function createManager(member) {
-    return `
+    let createManager = (manager) => {
+        return `
 <div class="columns m-2">
     <div class="column">
         <div class="card">
@@ -85,69 +87,31 @@ function createManager(member) {
                     <tbody>
                         <tr>
                             <th>Name</th>
-                            <td>${member.name}</td>
+                            <td>${manager.name}</td>
                         </tr>
                         <tr>
                             <th>ID</th>
-                            <td>${member.id}</td>
+                            <td>${manager.id}</td>
                         </tr>
                         <tr>
                             <th>Email</th>
-                            <td> <a href="mailto:${member.email}">${member.email}</a></td>
+                            <td> <a href="mailto:${manager.email}">${manager.email}</a></td>
                         </tr>
                         <tr>
                             <th>Office #</th>
-                            <td>${member.office}</td>
+                            <td>${manager.office}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
           </div>
     </div>`
-}
-
-
-
-//empty array for the returned card html
-let completedTeam = []
-
-function genCard(member) {
-
-    //attempt to use a dispatch table to generate employee cards
-    let dispatchTable = {
-        Engineer: createEngineer(member),
-
-        Intern: createIntern(member),
-
-        Manager: createManager(member)
     }
 
 
-    //get the employee role (will serve as dispatch table key)
-    let type = member.getRole();
-    //generate card
-    let card = dispatchTable[type](member)
-    //push the card returned to the array created earlier
-    completedTeam.push(card)
-}
-
-//array of team member objects passed in from script.js
-async function createHTML(team) {
-
-    //for each employee object in the team
-    //generate a card
-    await team.forEach((member) => {
-        genCard(member)
-    })
-
-    //then return the finished html
-
-    return fullPage(completedTeam.join(" "));
-}
-
-// slap the generated html for the employee cards into the main page and return it
-const fullPage = function (cards) {
-    return `
+    // slap the generated html for the employee cards into the main page and return it
+    let fullPage = (cards) => {
+        return `
     <!DOCTYPE html>
 <html>
   <head>
@@ -176,7 +140,48 @@ const fullPage = function (cards) {
 
   </body>
 </html>`
+    }
+
+    //array of team member objects passed in from script.js
+
+    //empty array for the returned card html
+    let completedTeam = []
+
+    //generate a card for each employee
+    for (let i = 0; i < array.length; i++) {
+        const member = array[i];
+
+        let dispatchTable = (type) => {
+
+            let list = {
+                "Engineer": createEngineer(member),
+
+                "Intern": createIntern(member),
+
+                "Manager": createManager(member)
+            }
+            return list[type]
+        }
+
+        //get the employee role (will serve as dispatch table key)
+        let type = member.getRole();
+
+        let card = dispatchTable(type)
+
+        //generate card and push to array
+        completedTeam.push(card)
+
+    }
+
+    let cards = completedTeam.join('')
+
+
+    let returnPage = () => {
+        Promise.resolve(
+            fullPage(cards)
+        )
+    }
+
+    return returnPage()
+    
 }
-
-
-module.exports = createHTML();

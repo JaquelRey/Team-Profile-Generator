@@ -1,5 +1,5 @@
 // get engineer constructor
-const Engineer = require('../lib/engineer');
+import {Engineer} from './engineer.js'
 // create engineer object
 
 test('creates a new engineer object', () => {

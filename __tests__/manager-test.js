@@ -1,5 +1,5 @@
 // get manager constructor
-const Manager = require('../lib/manager');
+import {Manager} from '../lib/manager.js'
 // create manager object
 
 test('creates a new manager object', () => {

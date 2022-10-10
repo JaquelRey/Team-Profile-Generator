@@ -1,5 +1,5 @@
 // get intern constructor
-const Intern = require('../lib/intern');
+import {Intern} from '../lib/intern.js'
 // create intern object
 
 test('creates a new intern object', () => {
