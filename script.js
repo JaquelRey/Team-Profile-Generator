@@ -33,11 +33,14 @@ const confirmTeam =
 
 //calls html generation, and returns it to fs
 let creatingPage = (checkedName) => {
-    
+
     console.log('Creating your team\'s page....');
     console.log('==========================')
 
     createPage(checkedName, teamArray)
+    setTimeout(() => {
+        return
+    }, 30);
 }
 
 const teamArray = [];
@@ -84,9 +87,10 @@ const callStack = async function (role) {
         console.log('==========================')
 
         await manager().then(async () => {
-            let query = await roleHandler()
 
+            let query = await roleHandler()
             await callStack(query.emprole)
+
         }
         )
 
@@ -114,48 +118,44 @@ const callStack = async function (role) {
 
     }
 
-
-
     // queries if user wants to continue creating employees
     // if true, generates and exits chain
     // if false, continues chain to query next employee's role
     // then passes that on recursion of callstack
+
     console.table(teamArray)
 
     console.log('Checking team status...')
 
+    await inquirer.prompt(confirmTeam).then((answer) => {
 
-    let answer = await inquirer.prompt(confirmTeam)
+        if (answer.finished === 'Finish Team') {
+
+            let fileName = (teamArray[0].name).replaceAll(' ', '')
+
+
+            console.log(`Success! Page location: ./created/${fileName}-team.html`);
+            console.log('==========================')
+
+            creatingPage(fileName)
+
+            return process.exit(0)
+
+        }
+    })
 
     //if user elects to finish building team and gen page
-    if (answer.finished === 'Finish Team') {
 
-        let fileName = (teamArray[0].name).replaceAll(' ', '')
-        
 
-        console.log(`Success! Page location: ./created/${fileName}-team.html`);
-        console.log('==========================')
+    console.log('Awaiting role selection...')
+    console.log('==========================')
 
-        try {
-            creatingPage(fileName)
-        } finally {
-            
-            setTimeout(() => {
-                process.exit(0)
-            }, 30);
-        }
+    let query = await roleHandler()
 
-    } else if (answer.finished != 'Finish Team') {
+    setTimeout(() => {
+        callStack(query.emprole)
+    }, 1000);
 
-        console.log('Awaiting role selection...')
-        console.log('==========================')
-
-        let query = await roleHandler()
-
-        setTimeout(() => {
-            callStack(query.emprole)
-        }, 1000);
-    }
 
 };
 
