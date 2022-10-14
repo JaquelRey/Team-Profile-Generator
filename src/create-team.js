@@ -1,11 +1,11 @@
 import * as fs from 'fs/promises'
-export const createPage = (fileName, array) => {
+export let createPage = async (fileName, array) => {
 
     let createEngineer = (engineer) => {
         return `
     <div class="column is-narrow">
         <div class="card">
-            <header class="card-header has-background-info">
+            <header class="card-header has-background-success">
               <p class="card-header-title has-text-white">
                 Engineer
               </p>
@@ -40,7 +40,7 @@ export const createPage = (fileName, array) => {
         return `
     <div class="column is-narrow">
         <div class="card">
-            <header class="card-header has-background-info">
+            <header class="card-header has-background-warning">
               <p class="card-header-title has-text-white">
                 Intern
               </p>
@@ -76,7 +76,7 @@ export const createPage = (fileName, array) => {
 
     <div class="column is-narrow">
         <div class="card">
-            <header class="card-header has-background-info">
+            <header class="card-header has-background-danger">
               <p class="card-header-title has-text-white">
                 Manager
               </p>
@@ -116,19 +116,18 @@ export const createPage = (fileName, array) => {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>Team ${fileName}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   </head>
   <body>
-  <section class="hero is-info">
+  <section class="hero is-small is-info">
     <div class="hero-body has-text-centered">
       <h1 class="title">
-        Hello World
+        ${fileName}'s Team
       </h1>
       <p class="subtitle">
-        My first website with <strong>Bulma</strong>!
+        Page generated with the power of <strong>Node!</strong>!
       </p>
-      <br>
     </div> </section>
 
     <div class="columns is-justify-content-center m-2">
@@ -173,22 +172,9 @@ export const createPage = (fileName, array) => {
     }
 
     let cards = completedTeam.join('')
-
-
-    
-
     let data = fullPage(cards)
 
-    let mymethod = async() => {
 
-        
-
-        
-        await fs.writeFile(`./created/${fileName}-team.html`, data);
-
-        
-    }
-
-    mymethod()
+    await fs.writeFile(`./created/${fileName}-team.html`, data).then(() => { return Promise.resolve() })
 
 }

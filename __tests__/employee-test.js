@@ -1,5 +1,5 @@
 // get employee constructor
-import {Employee} from './employee.js'
+import {Employee} from '../lib/employee.js'
 // create employee object
 
 test('creates a new employee object', () => {

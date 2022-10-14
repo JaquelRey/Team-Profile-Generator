@@ -1,22 +1,21 @@
-
-// node modules 
-
+// dependency 
 import inquirer from 'inquirer'
+import chalk from 'chalk';
+// employee queries based on role
+// return employee query object based on role
+import { createEmployees } from './src/inquirer-modules.js'
+import { manager, intern, engineer } from './src/employee-module.js'
 
 
 //func to generate html after data collection is finished
 import { createPage } from './src/create-team.js'
-import { createEmployees } from './src/inquirer-modules.js'
 
-//class constructors
-import { Manager } from './lib/Manager.js'
-import { Engineer } from './lib/Engineer.js'
-import { Intern } from './lib/Intern.js'
+//question objects for role selection and confirmation
 
 const chooseRole =
 {
     type: 'list',
-    name: 'emprole',
+    name: 'newrole',
     message: 'What\'s the role of your next team member?',
     choices: ['Intern', 'Engineer'],
 }
@@ -29,134 +28,90 @@ const confirmTeam =
     choices: ['Add Employee', 'Finish Team'],
 }
 
-
-
-//calls html generation, and returns it to fs
-let creatingPage = (checkedName) => {
+//passes object array and desired filename to module with fs
+let creatingPage = async (checkedName) => {
 
     console.log('Creating your team\'s page....');
-    console.log('==========================')
+    console.log(chalk.gray('=========================='))
 
-    createPage(checkedName, teamArray)
-    setTimeout(() => {
-        return
-    }, 30);
+    await createPage(checkedName, teamArray).then(() => {
+        console.log(chalk.bgGreen(`Success! Page location: ./created/${checkedName}-team.html`));
+        console.log(chalk.gray('=========================='))
+    })
 }
 
+//init array to store team members
 const teamArray = [];
 
 const callStack = async function (role) {
 
-    // check if user chose to generate html,
-    // passes team member array to generation if true
-
-
-    let roleHandler = () => {
-
-        return inquirer.prompt(chooseRole)
-
+    if (!role) {
+        console.log(chalk.gray('=========================='))
+        // selects role of next team member -
+        // prompts user, returns only needed value from answer object
+        role = await inquirer.prompt(chooseRole)
+            .then((selection) => { return selection.newrole })
     }
+    // returns queries based on role passed
+    let queries = createEmployees(role)
 
-    // question array for employee details
-    let employeeQuery = createEmployees(role)
-
-    let manager = async () => {
-        let answers = await inquirer.prompt(employeeQuery)
-        let { name, id, email, office } = answers
-        teamArray.push(new Manager(name, id, email, office))
-        return Promise.resolve()
-    }
-
-    let intern = async () => {
-        let answers = await inquirer.prompt(employeeQuery)
-        let { name, id, email, school } = answers
-        teamArray.push(new Intern(name, id, email, school))
-        return Promise.resolve()
-    }
-
-    let engineer = async () => {
-        let answers = await inquirer.prompt(employeeQuery)
-        let { name, id, email, github } = answers
-        teamArray.push(new Engineer(name, id, email, github))
-        return Promise.resolve()
-    }
-
-    // if the array is empty, make a manager
+    // call starts with role passed as manager
     if (role === 'Manager') {
-        console.log('Creating a Manager...')
-        console.log('==========================')
+        console.log(chalk.italic('Creating a Manager...'))
+        console.log(chalk.gray('=========================='))
+        await manager(queries).then(async (generated) => {
+            teamArray.push(generated)
 
-        await manager().then(async () => {
+            console.log(chalk.gray('=========================='))
+            console.log('Here\'s your current team:')
+            console.table(teamArray)
+            console.log(chalk.gray('=========================='))
 
-            let query = await roleHandler()
-            await callStack(query.emprole)
-
-        }
-        )
-
-    } else {
-        console.log('==========================')
-        console.log('Restarting stack...')
-        console.log('==========================')
+            await callStack()
+        })
     }
 
-    // else make employee based on role passed in from selection
+    // create employee based on role passed in
 
     if (role === 'Intern') {
-
-        console.log('Creating a new Intern...')
-        console.log('==========================')
-
-        await intern()
-
-    } else if (role === 'Engineer') {
-
-        console.log('Creating a new Engineer...')
-        console.log('==========================')
-
-        await engineer()
-
+        console.log(chalk.italic('Creating a new Intern...'))
+        console.log(chalk.gray('=========================='))
+        await intern(queries).then((generated) => {
+            teamArray.push(generated)
+        })
     }
 
-    // queries if user wants to continue creating employees
-    // if true, generates and exits chain
-    // if false, continues chain to query next employee's role
-    // then passes that on recursion of callstack
+    if (role === 'Engineer') {
+        console.log(chalk.italic('Creating a new Engineer...'))
+        console.log(chalk.gray('=========================='))
+        await engineer(queries).then((generated) => {
+            teamArray.push(generated)
+        })
+    }
 
+    console.log(chalk.gray('=========================='))
+    console.log('Here\'s your current team:')
     console.table(teamArray)
+    console.log(chalk.gray('=========================='))
+    console.log(chalk.yellow('Checking process status...'))
+    console.log(chalk.gray('=========================='))
 
-    console.log('Checking team status...')
-
-    await inquirer.prompt(confirmTeam).then((answer) => {
+    // checking if user wants to add another member,
+    // or finish process and generate team
+    await inquirer.prompt(confirmTeam).then(async (answer) => {
 
         if (answer.finished === 'Finish Team') {
 
             let fileName = (teamArray[0].name).replaceAll(' ', '')
-
-
-            console.log(`Success! Page location: ./created/${fileName}-team.html`);
-            console.log('==========================')
-
-            creatingPage(fileName)
-
+            await creatingPage(fileName)
+            console.log(chalk.blue('Exiting process...Bye!'))
             return process.exit(0)
 
+        } else {
+            console.log(chalk.gray('=========================='))
+            return callStack()
         }
     })
-
-    //if user elects to finish building team and gen page
-
-
-    console.log('Awaiting role selection...')
-    console.log('==========================')
-
-    let query = await roleHandler()
-
-    setTimeout(() => {
-        callStack(query.emprole)
-    }, 1000);
-
-
 };
 
 

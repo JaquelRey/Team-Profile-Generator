@@ -1,5 +1,5 @@
 // get engineer constructor
-import {Engineer} from './engineer.js'
+import {Engineer} from '../lib/engineer.js'
 // create engineer object
 
 test('creates a new engineer object', () => {
